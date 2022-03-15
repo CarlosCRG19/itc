@@ -1,0 +1,3 @@
+NATURAL_NUMBERS = set("123456789")
+LETTERS = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
