@@ -1,14 +1,27 @@
 #include <iostream>
-#include <unordered_map>
+#include <string>
+
 #include "Trie.h"
+
+using namespace std;
 
 int main()
 {
-  Trie trie_one;
-  trie_one.insert("develop");
-  trie_one.insert("developer");
-  
-  // std::cout << trie_one.lookup("developerr") << std::endl;
-  trie_one.dfs_print();
-  
+  int n; cin >> n;
+
+  Trie myTrie;
+
+  while (n > 0) {
+    string word; cin >> word;
+    myTrie.insert(word);
+    n--;
+  }
+
+  int m; cin >> m;
+
+  while (m > 0) {
+    string word; cin >> word;
+    cout << myTrie.lookup(word) << endl;
+    m--;
+  }
 }
