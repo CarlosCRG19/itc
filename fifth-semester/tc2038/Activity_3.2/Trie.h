@@ -4,6 +4,7 @@
 #include <cctype>
 #include <iostream>
 #include <string>
+#include <stdexcept>
 
 using namespace std;
 
@@ -24,9 +25,20 @@ public:
 
   TrieNode(char val)
   {
+
+    if (int(val) < 0 || int(val) > ALPHABET_SIZE)
+      throw std::invalid_argument("char is not in the alphabet");
+
     this->val = tolower(val);
   }
 
+  /**
+   * @brief returns if character is a child of a node.
+   * Complexity: O(1)
+   * 
+   * @param character a character to look for in the node
+   * @returns true if character is in node, else false
+   */
   bool has(char character)
   {
     char lowerCasedCharacter = tolower(character);
@@ -34,6 +46,12 @@ public:
     return this->get(lowerCasedCharacter) != nullptr;
   }
 
+  /**
+   * @brief adds a child to the node.
+   * Complexity: O(1)
+   * 
+   * @param node a node to add as a child
+   */
   void add_child(TrieNode *node)
   {
     char character = node->val;
@@ -42,6 +60,12 @@ public:
     this->children[int(lowerCasedCharacter) - ALPHABET_START] = node;
   }
 
+  /**
+   * @brief gets the child node with value `character`
+   * 
+   * @param character a character to look for in the node's children nodes
+   * @return TrieNode* a pointer to the fetched node
+   */
   TrieNode* get(char character)
   {
     char lowerCasedCharacter = tolower(character);
@@ -57,9 +81,15 @@ public:
 
   Trie()
   {
-    this->root = new TrieNode('@');
+    this->root = new TrieNode('\0');
   }
  
+  /**
+   * @brief inserts a word into the trie.
+   * Complexity: O(n). Insertion iterates the length of the word to insert.
+   * 
+   * @param word a word to insert into the trie.
+   */
   void insert(string word)
   {
     TrieNode *current_node = this->root;
@@ -82,6 +112,14 @@ public:
     current_node->is_end = true;
   }
 
+  /**
+   * @brief searches a word in the trie.
+   * Complexity: O(n). Lookup iterates the length of the word.
+   * 
+   * @param word 
+   * @return true if a sequence of nodes make the word, with and ending node marked as final.
+   * @return false otherwise
+   */
   bool lookup(string word)
   {
     TrieNode *current_node = this->root;
@@ -101,11 +139,21 @@ public:
     return current_node->is_end;
   }
 
+  /**
+   * @brief Prints the nodes in the trie, performing DFS.
+   * 
+   */
   void dfs_print()
   {
     this->dfs_print(this->root);
   }
 
+  /**
+   * @brief Recursively prints the nodes in the trie, using DFS.
+   * Complexity: O(n). DFS traverses every node in the trie.
+   * 
+   * @param node 
+   */
   void dfs_print(TrieNode *node)
   {
     cout << node->val << endl;
