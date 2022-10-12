@@ -21,7 +21,9 @@ int main()
 
   while (m > 0) {
     string word; cin >> word;
-    cout << myTrie.lookup(word) << endl;
+    cout << "lookup result for " << word << ": " << (myTrie.lookup(word) == 1 ? "true" : "false") << endl;
     m--;
   }
+
+  myTrie.dfs_print();
 }
