@@ -4,6 +4,16 @@ using namespace std;
 
 typedef vector<int> vi;
 
+/**
+ * @brief solves the KnapSack, given N items of values values[] and weights weights[], and a maximum capacity W.
+ * Complexity: O(nW), a dp 2d-array of size n x W is built and traversed.
+ *  
+ * @param N The number of different values
+ * @param values The array of values
+ * @param weights The weights of 
+ * @param W 
+ * @return int 
+ */
 int knapSack(int N, int values[], int weights[], int W) {
   if (N == 0 || W == 0) return 0;
 
