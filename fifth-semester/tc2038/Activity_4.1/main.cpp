@@ -7,39 +7,44 @@ struct Point {
   double y;
 };
 
-pair<double, bool> getSlope(Point p, Point q) {
-  if (q.x == p.x)
-    return make_pair(0, false);
+bool linesOnSegment(Point p, Point q, Point r)
+{
+  if (q.x <= max(p.x, r.x) && q.x >= min(p.x, r.x) &&
+    q.y <= max(p.y, r.y) && q.y >= min(p.y, r.y))
+    return true;
 
-  double slope = (q.y - p.y) / (q.x - p.x);
-
-  return make_pair(slope, true);
+  return false;
 }
 
-bool doIntersect(Point a1, Point a2, Point b1, Point b2) {
-  // Overlap in X
-  if (a2.x < b1.x || b2.x < a1.x)
+int findOrientation(Point p, Point q, Point r)
+{
+    int val = (q.y - p.y) * (r.x - q.x) -
+              (q.x - p.x) * (r.y - q.y);
+  
+    if (val == 0) return 0;  // collinear
+  
+    return (val > 0)? 1: 2; // clock or counterclock wise
+}
+
+bool linesIntersect(Point p1, Point q1, Point p2, Point q2)
+{
+    int o1 = findOrientation(p1, q1, p2);
+    int o2 = findOrientation(p1, q1, q2);
+    int o3 = findOrientation(p2, q2, p1);
+    int o4 = findOrientation(p2, q2, q1);
+  
+    if (o1 != o2 && o3 != o4)
+        return true;
+  
+    if (o1 == 0 && linesOnSegment(p1, p2, q1)) return true;
+  
+    if (o2 == 0 && linesOnSegment(p1, q2, q1)) return true;
+  
+    if (o3 == 0 && linesOnSegment(p2, p1, q2)) return true;
+  
+    if (o4 == 0 && linesOnSegment(p2, q1, q2)) return true;
+  
     return false;
-
-  // Overlap in Y
-  if (max(a1.y, a2.y) < min(b1.y, b2.y) || min(a1.y, a2.y) < max(b1.y, b2.y))
-    return false;
-
-  pair<double, bool> mA = getSlope(a1, a2);
-  pair<double, bool> mB = getSlope(b1, b2);
-
-  double bA = a1.y - mA.first*a1.x;
-  double bB = b1.y - mB.first*b1.x;
-
-  if (mA.first == mB.first)
-    return bA == bB;
-
-  double X = (bB - bA) / (mA.first - mB.first);
-
-  double low = max(a1.x, b1.x);
-  double high = min(a2.x, b2.x);
-
-  return X <= high && X >= low;
 }
 
 int main() {
@@ -52,17 +57,18 @@ int main() {
     double a2x; cin >> a2x;
     double a2y; cin >> a2y;
 
+    Point p1 = {a1x, a1y};
+    Point p2 = {a2x, a2y};
+
     double b1x; cin >> b1x;
     double b1y; cin >> b1y;
     double b2x; cin >> b2x;
     double b2y; cin >> b2y;
 
-    struct Point a1 = { a1x, a1y };
-    struct Point a2 = { a2x, a2y };
-    struct Point b1 = { b1x, b1y };
-    struct Point b2 = { b2x, b2y };
+    Point q1 = {b1x, b1y};
+    Point q2 = {b2x, b2y};
 
-    cout << doIntersect(a1, a2, b1, b2) << '\n';
+    cout << linesIntersect(p1, p2, q1, q2) << '\n';
   }
 
   return 0;
