@@ -61,13 +61,13 @@ void kruskalMST(int n, int adjMatrix[9][9])
 bool breadthFirstSearch(int n, int path[], int **graph, int source, int target)
 {
 
-	bool visited[n];
+	bool visitedBitMask[n];
 	for (int i = 0; i < n; i++)
-		visited[i] = false;
+		visitedBitMask[i] = false;
 
 	std::queue<int> q;
 	q.push(source);
-	visited[source] = true;
+	visitedBitMask[source] = true;
 	path[source] = -1;
 
 	while (!q.empty())
@@ -77,7 +77,7 @@ bool breadthFirstSearch(int n, int path[], int **graph, int source, int target)
 
 		for (int v = 0; v < n; v++)
 		{
-			if (visited[v] == false && graph[node][v] > 0)
+			if (visitedBitMask[v] == false && graph[node][v] > 0)
 			{
 				if (v == target)
 				{
@@ -86,7 +86,7 @@ bool breadthFirstSearch(int n, int path[], int **graph, int source, int target)
 				}
 				q.push(v);
 				path[v] = node;
-				visited[v] = true;
+				visitedBitMask[v] = true;
 			}
 		}
 	}
@@ -131,45 +131,80 @@ int fordFulkerson(int n, int **graph, int source, int target)
 	return maxFlow;
 }
 
+/**
+ * @brief Recursive function that gets called until route is traced.
+ *
+ * @param districts Adjacency matrix with the weights (distances) between districts.
+ * @param dpStates Permutations of possible routes.
+ * @param previousDistricts Permutations with order of visits.
+ * @param visitedBitMask Bit mask that represents visited districts. 0 means that the
+ * district has not been visited and 1 represents a visited district. As a binary number, it can
+ * also represent the permutations of possible visited districts. Because of this, it can also be
+ * represented as (2^n)-1, where n is the number of districts. However, using a binary representation
+ * can be useful in order to compare visited nodes and insert new ones.
+ * @param numberOfDistricts Number of districts.
+ *
+ * @return best route distance
+ *
+ * Time complexity: O(n^2 * 2^n) .
+ * Space complexity: O(n * 2^n) .
+ */
 int tspAuxiliar(std::vector<std::vector<int>> &districts,
 				std::vector<std::vector<int>> &dpStates,
 				std::vector<std::vector<int>> &previousDistricts,
 				int currentDistrict,
-				int visited,
+				int visitedBitMask,
 				int numberOfDistricts)
 {
+
+	// Bitmask that represents that all districts have been visited.
 	int fullBitMask = (1 << numberOfDistricts) - 1;
-	if (visited == fullBitMask)
+	// Every district has been visited.
+	if (visitedBitMask == fullBitMask)
 	{
 		return districts[currentDistrict][0];
 	}
-
-	if (dpStates[currentDistrict][visited] != INFINITE)
+	// A value for this subroute already exists and can be used.
+	if (dpStates[currentDistrict][visitedBitMask] != INFINITE)
 	{
-		return dpStates[currentDistrict][visited];
+		return dpStates[currentDistrict][visitedBitMask];
 	}
 
 	int index = INFINITE;
+	// Check remaining districts.
 	for (int i = 0; i < numberOfDistricts; i++)
 	{
-		if (!(i == currentDistrict || (visited & (1 << i))))
+		// Check if it has been visited
+		if (!(i == currentDistrict || (visitedBitMask & (1 << i))))
 		{
-			int distance = districts[currentDistrict][i] + tspAuxiliar(districts, dpStates, previousDistricts, i, visited | (1 << i), numberOfDistricts);
-			if (distance < dpStates[currentDistrict][visited])
-				dpStates[currentDistrict][visited] = distance;
+			// Remaining distance
+			int distance = districts[currentDistrict][i] + tspAuxiliar(districts, dpStates, previousDistricts, i, visitedBitMask | (1 << i), numberOfDistricts);
+			// Check if distance is less than current value
+			if (distance < dpStates[currentDistrict][visitedBitMask])
+			{
+				dpStates[currentDistrict][visitedBitMask] = distance;
+			}
 			index = i;
 		}
 	}
 
-	previousDistricts[currentDistrict][visited] = index;
+	// Permutations with visited districts
+	previousDistricts[currentDistrict][visitedBitMask] = index;
 
-	return dpStates[currentDistrict][visited];
+	return dpStates[currentDistrict][visitedBitMask];
 }
 
-int tsp(std::vector<std::vector<int>> districts)
+/**
+ * @brief Finds the shortest route that includes every district
+ * using dynamic programming and memoization.
+ *
+ * @param districts Adjacency matrix with the weights (distances) between districts.
+ *
+ * Time complexity: O(n^2 * 2^n) .
+ * Space complexity: O(n * 2^n) .
+ */
+void tsp(std::vector<std::vector<int>> districts)
 {
-	std::cout << "xd" << std::endl;
-
 	std::vector<std::vector<int>> dpStates(districts.size(), std::vector((1 << districts.size()) - 1, INFINITE));
 	std::vector<std::vector<int>> previousDistricts(districts.size(), std::vector((1 << districts.size()) - 1, INFINITE));
 	std::vector<int> minimumDistanceRoute(districts.size());
@@ -179,6 +214,7 @@ int tsp(std::vector<std::vector<int>> districts)
 
 	std::cout << "Minimum distance: " << tspAuxiliar(districts, dpStates, previousDistricts, 0, 1, districts.size()) << std::endl;
 	std::cout << "Best route: ";
+	// Trace best route of visitedBitMask districts
 	for (int i = 0; i < minimumDistanceRoute.size(); i++)
 	{
 		minimumDistanceRoute[i] = currentDistrict;
@@ -187,8 +223,6 @@ int tsp(std::vector<std::vector<int>> districts)
 		std::cout << minimumDistanceRoute[i] << "-> ";
 	}
 	std::cout << 0 << std::endl;
-
-	return 0;
 }
 
 #endif
