@@ -1,0 +1,8 @@
+Integrantes del equipo:
+
+- José Antonio Chaires Monroy - A01640114 - Forma de cableado óptimo, Ruta para repartir correspondencia
+- Luis David López Magaña - A00344656 - Flujo máximo de información entre nodos
+- Carlos César Rodríguez García - A00344666 - Lista de polígonos
+
+Es importante notar que si bien asignamos la responsabilidad de *dirigir el cumplimiento* de cada una de las cuatro actividades,
+todos participamos en el desarrollo de las mismas.

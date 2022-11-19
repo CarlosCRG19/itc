@@ -2,6 +2,9 @@
 #define DISJOINTSET_H
 
 #include <iostream>
+#include <utility>
+
+using std::pair;
 
 /**
  * This class abstracts the behavior of our disjoint set.
@@ -16,7 +19,6 @@ private:
     int *parents;
 
 public:
-
     DisjointSet(int n) {
         this->n = n;
         this->parents = new int[n];
@@ -44,7 +46,17 @@ public:
     {
         parents[element] = parentNode;
     }
-
 };
+
+struct Edge
+{
+	int dest, weight, src;
+
+	Edge(int d, int w, int s) : dest(d), weight(w), src(s) {}
+};
+
+typedef pair<double, double> Point;
+#define x first
+#define y second
 
 #endif

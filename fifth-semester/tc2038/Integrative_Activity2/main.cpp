@@ -1,53 +1,82 @@
-#include <iostream>
 #include <algorithm>
+#include <iostream>
+#include <string>
 #include <vector>
 
-#include "./DisjointSet.h"
 #include "./solutions.h"
+#include "./types.h"
 
-const int N = 9;
+using std::cin;
+using std::cout;
+using std::string;
+using std::vector;
+
+typedef vector<int> vi;
+
+void fillSquareMatrix(vector<vi> &matrix)
+{
+  int N = matrix.size();
+
+  for (int i=0; i<N; i++) {
+    for (int j=0; j<N; j++) {
+      cin >> matrix[i][j];
+    }
+  }
+}
+
+void fillArrayOfPoints(vector<Point> &points)
+{
+  int N = points.size();
+
+  for (int i=0; i<N; i++) {
+    string pointAsString;
+    cin >> pointAsString;
+
+    pointAsString.erase(0, 1);
+    pointAsString.erase(pointAsString.size() - 1, 1);
+
+    char delimiterChar = ',';
+    size_t delimeterCharPosition = pointAsString.find(delimiterChar);
+
+    if (delimeterCharPosition != string::npos) {
+      Point p;
+
+      double x = stod(pointAsString.substr(0, delimeterCharPosition));
+      pointAsString.erase(0, delimeterCharPosition + 1);
+      double y = stod(pointAsString);
+
+      p.x = x; p.y = y;
+
+      points.push_back(p);
+    }
+  }
+}
 
 int main()
 {
+  int N;
+  cin >> N;
 
-	int adjMatrix[N][N] = {
-		{0, 4, 0, 0, 0, 0, 0, 8, 0},
-		{4, 0, 8, 0, 0, 0, 0, 11, 0},
-		{0, 8, 0, 7, 0, 4, 0, 0, 2},
-		{0, 0, 7, 0, 9, 14, 0, 0, 0},
-		{0, 0, 0, 9, 0, 10, 0, 0, 0},
-		{0, 0, 4, 14, 10, 0, 2, 0, 0},
-		{0, 0, 0, 0, 0, 2, 0, 1, 6},
-		{8, 11, 0, 0, 0, 0, 1, 0, 7},
-		{0, 0, 2, 0, 0, 0, 6, 7, 0}};
+  vector<vi> neighborhoodsDistances(N, vi(N)), neighborhoodsTransmissions(N, vi(N));
+  vector<Point> stations(N);
 
-	std::vector<std::vector<int>> adjMatrixVect = {
-		{0, 4, 0, 0, 0, 0, 0, 8, 0},
-		{4, 0, 8, 0, 0, 0, 0, 11, 0},
-		{0, 8, 0, 7, 0, 4, 0, 0, 2},
-		{0, 0, 7, 0, 9, 14, 0, 0, 0},
-		{0, 0, 0, 9, 0, 10, 0, 0, 0},
-		{0, 0, 4, 14, 10, 0, 2, 0, 0},
-		{0, 0, 0, 0, 0, 2, 0, 1, 6},
-		{8, 11, 0, 0, 0, 0, 1, 0, 7},
-		{0, 0, 2, 0, 0, 0, 6, 7, 0}};
+  fillSquareMatrix(neighborhoodsDistances);
+  fillSquareMatrix(neighborhoodsTransmissions);
 
-	// kruskalMST(N, adjMatrix);
+  fillArrayOfPoints(stations);
 
-	int nFlux;
-	std::cin >> nFlux;
-	int **fluxMatrix = new int *[nFlux];
-	for (int i = 0; i < nFlux; i++)
-	{
-		fluxMatrix[i] = new int[nFlux];
-		for (int j = 0; j < nFlux; j++)
-			std::cin >> fluxMatrix[i][j];
-	}
+  // Optimal wiring
+  kruskalMST(neighborhoodsDistances);
+  cout << "\n";
 
-	int maxFlow = fordFulkerson(nFlux, fluxMatrix, 0, 5);
-	std::cout << "Max flow is: " << maxFlow << std::endl;
+  // Mail delivery route
+  tsp(neighborhoodsDistances);
+  cout << "\n";
 
-	tsp(adjMatrixVect);
+  // Max flow between nodes
+  fordFulkerson(neighborhoodsTransmissions, 0, N - 1); // Sample node
+  cout << "\n";
 
-	return 0;
+  // Convex Hull
+  grahamScan(stations);
 }
