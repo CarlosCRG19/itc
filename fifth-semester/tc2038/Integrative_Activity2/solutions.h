@@ -31,7 +31,7 @@ bool compareEdge(Edge e1, Edge e2)
  *
  * @param districts Adjacency matrix with the weights (distances) between districts.
  *
- * Time complexity: O(v^2 + log(e)).
+ * Time complexity: O(e^2 + e*(log(e))).
  * Space complexity: O(v + e).
  */
 void kruskalMST(vector<vector<int> > &adjMatrix)
